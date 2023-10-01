@@ -1,3 +1,4 @@
+import random
 from typing import Optional
 import arcade
 from arcade import Texture
@@ -5,7 +6,22 @@ from arcade import Texture
 
 # class Ball
 class Ball(arcade.Sprite):
-    ...
+    def __init__(self, game):
+        super().__init__()
+        self.center_x = game.width // 2
+        self.center_y = game.height // 2
+        self.color = arcade.color.YELLOW
+        self.radius = 15
+        self.change_x = random.choice([-1, 1])
+        self.change_y = random.choice([-1, 1])
+        self.speed = 3
+
+    def move(self):
+        self.center_x += self.change_x * self.speed
+        self.center_y += self.change_y * self.speed
+
+    def draw(self):
+        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
 
 
 # class Rocket
@@ -41,6 +57,7 @@ class Game(arcade.Window):
         self.player_2 = Rocket(
             self.width - 40, self.height // 2, arcade.color.BLUE, "Computer"
         )
+        self.ball = Ball(self)
 
     def on_draw(self):
         arcade.start_render()
@@ -90,11 +107,16 @@ class Game(arcade.Window):
 
         self.player_1.draw()
         self.player_2.draw()
+        self.ball.draw()
         arcade.finish_render()
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
-        self.player_1.center_x = x
-        self.player_1.center_y = y
+        if self.player_1.height < y < self.height - self.player_1.height:
+            self.player_1.center_y = y
+
+    def on_update(self, delta_time: float):
+        self.ball.move()
+
 
 game = Game()
 arcade.run()
