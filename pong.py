@@ -14,7 +14,9 @@ class Ball(arcade.Sprite):
         self.radius = 15
         self.change_x = random.choice([-1, 1])
         self.change_y = random.choice([-1, 1])
-        self.speed = 3
+        self.speed = 5
+        self.width = self.radius * 2
+        self.height = self.radius * 2
 
     def move(self):
         self.center_x += self.change_x * self.speed
@@ -28,6 +30,7 @@ class Ball(arcade.Sprite):
 class Rocket(arcade.Sprite):
     def __init__(self, x, y, color, n):
         super().__init__()
+        
         self.center_x = x
         self.center_y = y
         self.color = color
@@ -39,8 +42,23 @@ class Rocket(arcade.Sprite):
         self.speed = 4
         self.score = 0
 
-    def move(self):
-        ...
+    def move(self, game, ball):
+        if ball.center_x > game.width //2 :
+            self.change_y  = ball.change_y
+            
+            if self.center_y > ball.center_y:
+                self.change_y = -1
+
+            if self.center_y < ball.center_y:
+                self.change_y = 1
+
+            self.center_y += self.change_y * self.speed
+
+            if self.center_y < 60 :
+                self.center_y = 60
+
+            if self.center_y > game.height - 60:
+                self.center_y = game.height -60
 
     def draw(self):
         arcade.draw_rectangle_filled(
@@ -83,6 +101,7 @@ class Game(arcade.Window):
         arcade.draw_text(
             self.player_1.name, self.width // 5, 40, arcade.color.WHITE, font_size=20
         )
+        
         arcade.draw_text(
             self.player_2.name,
             self.width - self.width // 3,
@@ -90,6 +109,7 @@ class Game(arcade.Window):
             arcade.color.WHITE,
             font_size=20,
         )
+        
         arcade.draw_text(
             self.player_1.score,
             self.width // 4,
@@ -97,8 +117,9 @@ class Game(arcade.Window):
             arcade.color.WHITE,
             font_size=25,
         )
+        
         arcade.draw_text(
-            self.player_1.score,
+            self.player_2.score,
             self.width - self.width // 4,
             self.height - 60,
             arcade.color.WHITE,
@@ -108,6 +129,7 @@ class Game(arcade.Window):
         self.player_1.draw()
         self.player_2.draw()
         self.ball.draw()
+
         arcade.finish_render()
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
@@ -116,7 +138,30 @@ class Game(arcade.Window):
 
     def on_update(self, delta_time: float):
         self.ball.move()
+        self.player_2.move(self, self.ball)
+            
 
+        if self.ball.center_y < 30 or self.ball.center_y > self.height - 30:
+            self.ball.change_y *= -1
+
+        if arcade.check_for_collision(self.ball,  self.player_1):
+            self.ball.change_x *= -1
+
+        if arcade.check_for_collision(self.ball,  self.player_2):
+            self.ball.change_x *= -1
+
+        if self.ball.center_x < 0 :
+            print("Goal !!!")
+            self.player_2.score += 1
+            del self.ball
+            self.ball = Ball(self)
+
+        if self.ball.center_x > self.width:
+            print("Goal !!!")
+            self.player_1.score +=1
+            del self.ball
+            self.ball = Ball(self)
+        
 
 game = Game()
 arcade.run()
