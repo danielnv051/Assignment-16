@@ -1,10 +1,8 @@
-
 import arcade
 
-class Life ( arcade.Sprite ) :
-
-    def __init__ ( self , width , height) :
-        super().__init__("./images/heart.png")
+class Life(arcade.Sprite):
+    def __init__(self, width, height):
+        super().__init__("./images/paddle.png")
         self.width = 25
         self.height = 25
         self.center_x = width
