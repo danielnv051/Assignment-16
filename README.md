@@ -9,5 +9,5 @@
 
 
 
-[![pong game](pong/images/pong.png)]
-[![breakout game](breakout/images/breakout.png)]
+[pong game](pong/images/pong.png)
+[breakout game](breakout/images/breakout.png)
